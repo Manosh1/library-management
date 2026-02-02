@@ -24,14 +24,7 @@ const signup = async (req, res) => {
       });
     }
 
-    const existingUserByUsername = await User.findByUsername(username);
-    if (existingUserByUsername) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Username already taken' 
-      });
-    }
-
+  
     // Create new user
     const userId = await User.create({
       username,
@@ -66,12 +59,13 @@ const signup = async (req, res) => {
 
 // Login controller
 const login = async (req, res) => {
+  console.log("Req body", req.body)
   try {
     const { email, password } = req.body;
-
+console.log("Email", email, "Password", password)
     // Find user by email
     const user = await User.findByEmail(email);
-    
+    console.log("User", user)
     if (!user) {
       return res.status(401).json({ 
         success: false, 
@@ -81,7 +75,7 @@ const login = async (req, res) => {
 
     // Verify password
     const isPasswordValid = await User.verifyPassword(password, user.password);
-    
+       console.log("Password verify", isPasswordValid)
     if (!isPasswordValid) {
       return res.status(401).json({ 
         success: false, 
@@ -91,7 +85,7 @@ const login = async (req, res) => {
 
     // Generate token
     const token = generateToken(user.id);
-
+console.log("Token generate", token)
     // Remove password from user object
     const { password: _, ...userWithoutPassword } = user;
 

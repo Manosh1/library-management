@@ -3,7 +3,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
-
+const adminRoutes= require('./routes/admin.routes');
+const bookRoutes = require('./routes/book.routes')
 // Load environment variables
 dotenv.config();
 
@@ -17,7 +18,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-
+app.use("/api/books", bookRoutes);
+app.use("/api/admin", adminRoutes);
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({ 
