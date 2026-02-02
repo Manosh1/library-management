@@ -24,7 +24,7 @@ const Members = () => {
   // Filter members
   const filteredMembers = members.filter(member => {
     const matchesSearch = 
-      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       member.phone.includes(searchTerm);
     
@@ -158,7 +158,7 @@ const Members = () => {
                   </div>
                 </div>
                 
-                <h3 className="font-bold text-lg text-gray-900 mb-2">{member.name}</h3>
+                <h3 className="font-bold text-lg text-gray-900 mb-2">{member.full_name}</h3>
                 
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center text-gray-600">
@@ -229,7 +229,7 @@ const Members = () => {
                           <User className="text-blue-600" size={18} />
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">{member.name}</div>
+                          <div className="font-medium text-gray-900">{member.full_name}</div>
                           <div className="text-sm text-gray-500">ID: {member.id}</div>
                         </div>
                       </div>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { BookOpen, Lock, Mail } from 'lucide-react';
 
-const Login = () => {
+const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,9 +19,12 @@ const Login = () => {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const result = await login(email, password);
+      
+      const result = login(email, password);
+
+      console.log('Result' , result)
       if (result.success) {
-        navigate('/admin');
+        navigate('/admin/');
       } else {
         setError('Invalid credentials');
       }
@@ -43,7 +46,7 @@ const Login = () => {
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">LibraryPro</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to manage your library system
+            Admin Login
           </p>
         </div>
 
@@ -127,4 +130,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;

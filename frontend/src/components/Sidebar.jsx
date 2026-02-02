@@ -1,32 +1,46 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  Home, 
-  BookOpen, 
-  Users, 
-  RefreshCw, 
-  FileText, 
-  BarChart, 
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  Home,
+  BookOpen,
+  Users,
+  RefreshCw,
+  FileText,
+  BarChart,
   Settings,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+  ChevronRight,
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const menuItems = [
-    { path: '/', icon: Home, label: 'Dashboard' },
-    { path: '/books', icon: BookOpen, label: 'Books' },
-    { path: '/members', icon: Users, label: 'Members' },
-    { path: '/borrow-return', icon: RefreshCw, label: 'Borrow/Return' },
-    { path: '/transactions', icon: FileText, label: 'Transactions' },
-    { path: '/reports', icon: BarChart, label: 'Reports' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
+  const { user } = useAuth();
+
+  const adminMenu = [
+    { path: "/admin", icon: Home, label: "Dashboard" },
+    { path: "/admin/books", icon: BookOpen, label: "Books" },
+    { path: "/admin/members", icon: Users, label: "Members" },
+    { path: "/admin/borrow-return", icon: RefreshCw, label: "Borrow/Return" },
+    { path: "/admin/transactions", icon: FileText, label: "Transactions" },
+    { path: "/admin/reports", icon: BarChart, label: "Reports" },
+    { path: "/admin/settings", icon: Settings, label: "Settings" },
   ];
+
+  const memberMenu = [
+    { path: "/", icon: Home, label: "Dashboard" },
+    { path: "/books", icon: BookOpen, label: "Books" },
+    { path: "/borrow-return", icon: RefreshCw, label: "My Borrowed Books" },
+        { path: "/transaction", icon: RefreshCw, label: "Transaction" },
+    { path: "/settings", icon: Users, label: "Profile" },
+  ];
+
+  const menuItems =
+    user?.role === "admin" ? adminMenu : memberMenu;
 
   return (
     <aside
       className={`fixed left-0 top-0 h-screen bg-white shadow-lg border-r border-gray-200 transition-all duration-300 z-10 ${
-        isOpen ? 'w-64' : 'w-20'
+        isOpen ? "w-64" : "w-20"
       }`}
     >
       <div className="flex flex-col h-full">
@@ -34,9 +48,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             {isOpen ? (
-              <h1 className="text-xl font-bold text-blue-600">LibraryPro</h1>
+              <h1 className="text-xl font-bold text-blue-600">
+                LibraryPro
+              </h1>
             ) : (
-              <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
+              <div className="w-8 h-8 bg-blue-600 rounded-lg" />
             )}
             <button
               onClick={toggleSidebar}
@@ -47,7 +63,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </div>
         </div>
 
-        {/* Menu Items */}
+        {/* Menu */}
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
             {menuItems.map((item) => (
@@ -57,13 +73,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   className={({ isActive }) =>
                     `flex items-center rounded-lg px-4 py-3 transition-colors ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
                     }`
                   }
                 >
                   <item.icon size={20} />
-                  {isOpen && <span className="ml-3 font-medium">{item.label}</span>}
+                  {isOpen && (
+                    <span className="ml-3 font-medium">
+                      {item.label}
+                    </span>
+                  )}
                 </NavLink>
               </li>
             ))}

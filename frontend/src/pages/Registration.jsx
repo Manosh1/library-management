@@ -148,9 +148,10 @@ const Registration = () => {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Already have an account?{" "}
-          <span className="text-indigo-600 hover:underline cursor-pointer">
+          <a href="/login"><span className="text-indigo-600 hover:underline cursor-pointer">
             Login
-          </span>
+          </span></a>
+          
         </p>
       </div>
     </div>

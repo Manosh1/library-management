@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-
+import axios from 'axios';
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
@@ -10,21 +10,32 @@ export const AuthProvider = ({ children }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = (email, password) => {
-    // Mock authentication
-    const mockUser = {
-      id: 1,
-      name: 'Admin User',
-      email: email,
-      role: 'admin',
-      avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff'
+const login = async (email, password) => {
+
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3000/api/auth/login",
+      { email, password }
+    );
+
+
+    const { user, token } = res.data;
+console.log("User",user)
+    setUser(user);
+    localStorage.setItem("library_user", JSON.stringify(user));
+    localStorage.setItem("library_token", token);
+
+    return { success: true, user };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || "Login failed. Try again.",
     };
-    
-    setUser(mockUser);
-    localStorage.setItem('library_user', JSON.stringify(mockUser));
-    localStorage.setItem('library_token', 'mock-jwt-token');
-    return { success: true, user: mockUser };
-  };
+  }
+};
+
 
   const logout = () => {
     setUser(null);
