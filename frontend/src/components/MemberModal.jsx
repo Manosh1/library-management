@@ -3,6 +3,15 @@ import axios from "axios";
 import { X, User } from "lucide-react";
 
 const MemberModal = ({ user, onClose, refresh }) => {
+const [showModal, setShowModal] = useState(false);
+const [selectedUser, setSelectedUser] = useState(null);
+
+const handleEdit = (user) => {
+  setSelectedUser(user);
+  setShowModal(true);
+};
+
+
   const [formData, setFormData] = useState({
     username: "",
     full_name: "",
@@ -114,12 +123,18 @@ const MemberModal = ({ user, onClose, refresh }) => {
             className="w-full border px-3 py-2 rounded"
           />
 
-          <input
+       <input
   placeholder="Email"
   value={formData.email}
-  readOnly
-  className="w-full border px-3 py-2 rounded bg-gray-100 cursor-not-allowed"
+  onChange={(e) =>
+    setFormData({ ...formData, email: e.target.value })
+  }
+  readOnly={!!user}
+  className={`w-full border px-3 py-2 rounded ${
+    user ? "bg-gray-100 cursor-not-allowed" : ""
+  }`}
 />
+
 
 
           {!user && (

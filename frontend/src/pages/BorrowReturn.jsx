@@ -21,48 +21,64 @@ const BorrowReturn = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   // Filter available books for borrowing
-  const availableBooks = books.filter(book => book.availableCopies > 0);
-  
+const availableBooks = books.filter(
+  book => book.available_copies > 0 && book.status === "active"
+);
+
   // Filter members who can borrow more books
-  const eligibleMembers = members.filter(member => 
-    member.status === 'active' && member.booksBorrowed < member.maxBooksAllowed
-  );
+const eligibleMembers = members.filter(member => member.status === 1);
 
+
+
+ 
+console.log("Transactions Books:", transactions);
   // Get active borrowings for return
-  const activeBorrowings = transactions.filter(t => t.status === 'active');
+ const activeBorrowings = transactions.filter(
+  (t) => t.status === 'borrowed' && !t.return_date
+);
 
-  const handleBorrow = () => {
-    if (!selectedBook || !selectedMember) {
-      setMessage({ type: 'error', text: 'Please select both a book and a member' });
-      return;
-    }
 
-    const success = borrowBook(selectedBook.id, selectedMember.id);
-    if (success) {
-      setMessage({ 
-        type: 'success', 
-        text: `Successfully borrowed "${selectedBook.title}" for ${selectedMember.name}` 
-      });
-      setSelectedBook(null);
-      setSelectedMember(null);
-      setSearchBook('');
-      setSearchMember('');
-    } else {
-      setMessage({ 
-        type: 'error', 
-        text: 'Failed to borrow book. Please check availability or member limits.' 
-      });
-    }
-  };
+ const handleBorrow = async () => {
+  if (!selectedBook || !selectedMember) {
+    setMessage({ type: 'error', text: 'Please select both a book and a member' });
+    return;
+  }
 
-  const handleReturn = (transactionId) => {
-    const success = returnBook(transactionId);
-    if (success) {
-      setMessage({ type: 'success', text: 'Book returned successfully' });
-    } else {
-      setMessage({ type: 'error', text: 'Failed to return book' });
-    }
-  };
+  try {
+     const response = await borrowBook(selectedBook.id, selectedMember.id);
+console.log("Borrow  frontend Response:", response);
+    setMessage({
+      type: 'success',
+      text: `Successfully borrowed "${selectedBook.title}" for ${selectedMember.full_name}`
+    });
+
+    setSelectedBook(null);
+    setSelectedMember(null);
+    setSearchBook('');
+    setSearchMember('');
+
+  } catch (error) {
+    setMessage({
+      type: 'error',
+      text: error.response?.data?.message || 'Borrow failed'
+    });
+  }
+};
+
+
+  const handleReturn = async (transactionId) => {
+  try {
+    await returnBook(transactionId);
+    setMessage({ type: 'success', text: 'Book returned successfully' });
+  } catch (error) {
+    setMessage({
+      type: 'error',
+      text: error.response?.data?.message || 'Return failed'
+    });
+  }
+};
+
+
 
   const filteredBooks = availableBooks.filter(book =>
     book.title.toLowerCase().includes(searchBook.toLowerCase()) ||
@@ -70,7 +86,7 @@ const BorrowReturn = () => {
   );
 
   const filteredMembers = eligibleMembers.filter(member =>
-    member.name.toLowerCase().includes(searchMember.toLowerCase()) ||
+    member.full_name.toLowerCase().includes(searchMember.toLowerCase()) ||
     member.email.toLowerCase().includes(searchMember.toLowerCase())
   );
 
@@ -210,7 +226,7 @@ const BorrowReturn = () => {
                         <User className="text-blue-600" size={18} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{member.name}</h3>
+                        <h3 className="font-medium text-gray-900">{member.full_name}</h3>
                         <p className="text-sm text-gray-600">{member.email}</p>
                         <div className="flex items-center mt-2 text-sm">
                           <span className="text-gray-500 mr-4">Books: {member.booksBorrowed}/{member.maxBooksAllowed}</span>
@@ -248,7 +264,7 @@ const BorrowReturn = () => {
                 {selectedMember && (
                   <div className="p-3 bg-white rounded-lg">
                     <div className="text-sm text-gray-500 mb-1">Selected Member</div>
-                    <div className="font-medium">{selectedMember.name}</div>
+                    <div className="font-medium">{selectedMember.full_name}</div>
                     <div className="text-sm text-gray-600">{selectedMember.email}</div>
                   </div>
                 )}
@@ -277,7 +293,8 @@ const BorrowReturn = () => {
           {activeBorrowings.length > 0 ? (
             <div className="space-y-4">
               {activeBorrowings.map((transaction) => {
-                const dueDate = new Date(transaction.dueDate);
+                const dueDate = new Date(transaction.due_date);
+
                 const today = new Date();
                 const isOverdue = dueDate < today;
                 const daysOverdue = isOverdue 
@@ -293,22 +310,29 @@ const BorrowReturn = () => {
                             <BookOpen className="text-blue-600" size={18} />
                           </div>
                           <div>
-                            <h3 className="font-medium text-gray-900">{transaction.bookTitle}</h3>
-                            <p className="text-sm text-gray-600">Borrowed by: {transaction.memberName}</p>
+                   <h3 className="font-medium text-gray-900">
+  {transaction.book_title}
+</h3>
+<p className="text-sm text-gray-600">
+  Borrowed by: {transaction.member_name}
+</p>
+
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-500">Borrowed:</span>{' '}
-                            <span className="font-medium">{transaction.date}</span>
+                           <span className="font-medium">
+  {new Date(transaction.borrow_date).toLocaleDateString()}
+</span>
+
                           </div>
                           <div>
-                            <span className="text-gray-500">Due:</span>{' '}
                             <span className={`font-medium ${isOverdue ? 'text-red-600' : 'text-gray-900'}`}>
-                              {transaction.dueDate}
-                              {isOverdue && ` (${daysOverdue} days overdue)`}
-                            </span>
+  {new Date(transaction.due_date).toLocaleDateString()}
+  {isOverdue && ` (${daysOverdue} days overdue)`}
+</span>
+
                           </div>
                           <div>
                             <span className="text-gray-500">Transaction ID:</span>{' '}

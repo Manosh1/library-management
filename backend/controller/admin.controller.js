@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 // ✅ CREATE USER (default role = member)
 exports.createUser = async (req, res) => {
   try {
+    console.log("Incoming Data:", req.body);
+
     const {
       username,
       full_name,
@@ -14,9 +16,16 @@ exports.createUser = async (req, res) => {
       address,
     } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        message: "Username, email and password are required",
+      });
+    }
 
-    await db.execute(
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Password hashed");
+
+    const result = await db.execute(
       `
       INSERT INTO users 
       (username, full_name, email, password, role, phone, address)
@@ -24,7 +33,7 @@ exports.createUser = async (req, res) => {
       `,
       [
         username,
-        full_name,
+        full_name || null,
         email,
         hashedPassword,
         role || "member",
@@ -33,14 +42,27 @@ exports.createUser = async (req, res) => {
       ]
     );
 
+    console.log("Insert Result:", result);
+
     res.status(201).json({ message: "User created successfully" });
+
   } catch (err) {
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({ message: "Email or username already exists" });
-    }
+    console.log("DB ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.deleteUserById = async (req, res) => {
+  const userId = req.query.id;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+  await db.execute("DELETE FROM users WHERE id = ?", [userId]);
+  res.json({ message: "User deleted successfully" });
+};
+
+
+
 
 // ✅ GET ALL USERS
 exports.getAllUsers = async (req, res) => {
@@ -53,6 +75,7 @@ exports.getAllUsers = async (req, res) => {
       role,
       phone,
       address,
+      status,
       created_at
     FROM users
     where role="member"
@@ -73,7 +96,9 @@ exports.getUserById = async (req, res) => {
       email,
       role,
       phone,
-      address
+      address,
+      status,
+      created_at
     FROM users
     WHERE id = ?
     `,

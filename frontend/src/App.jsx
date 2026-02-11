@@ -23,6 +23,7 @@ import { LibraryProvider } from "./contexts/LibraryContext";
 import { AdminRoute, MemberRoute } from "./components/ProtectedRoute";
 import MemberLayout from "./components/Layout/MemberLayout";
 
+import AdminLogin from "./pages/Admin/Login";
 // Use
  import UserBorrowReturn from "./pages/User/BorrowReturnPage";
  import UserSettings from "./pages/User/SettingPage";
@@ -40,6 +41,7 @@ function App() {
             {/* Public */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Registration />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
 
             {/* Member Routes */}
 <Route

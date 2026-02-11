@@ -20,6 +20,8 @@ const Dashboard = () => {
     .sort((a, b) => b.id - a.id)
     .slice(0, 5);
 
+    console.log("Dashboard Transactions:", transactions);
+
   // Get overdue books
   const today = new Date();
   const overdueTransactions = transactions.filter(t => {

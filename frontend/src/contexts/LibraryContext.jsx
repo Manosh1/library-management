@@ -51,29 +51,79 @@ export const LibraryProvider = ({ children }) => {
   };
 
   // 🔁 TRANSACTIONS (borrow / return)
-  const borrowBook = async (bookId, memberId) => {
-    await api.post("/transactions/borrow", { bookId, memberId });
-    fetchBooks();
-    fetchTransactions();
-  };
+const borrowBook = async (bookId, memberId) => {
+  try {
+    const response = await api.post("/admin/transactions/borrow", {
+      bookId,
+      memberId
+    });
 
-  const returnBook = async (transactionId) => {
-    await api.post("/transactions/return", { transactionId });
-    fetchBooks();
-    fetchTransactions();
-  };
+    console.log("Borrow Response:", response.data);
+
+    return response.data;
+
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Borrow failed"
+    };
+  }
+};
+
+
+const returnBook = async (transactionId) => {
+  try {
+    const response = await api.post("/admin/transactions/return", {
+      transactionId
+    });
+
+    await fetchBooks();
+    await fetchTransactions();
+
+    return {
+      success: true,
+      message: response.data.message
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "Return failed"
+    };
+  }
+};
+
+
 
   const fetchTransactions = async () => {
-    const res = await api.get("/transactions");
+    const res = await api.get("/admin/all-transactions");
+    console.log("Fetch Transactions", res);
     setTransactions(res.data);
   };
+
+ 
 
   // 👤 MEMBERS
   const fetchMembers = async () => {
     const res = await api.get("/admin/users");
-   
+   console.log("Fetch Members", res.data)
     setMembers(res.data);
   };
+
+  const deleteMemberById = async (id) => {
+    await api.delete(`/admin/users/${id}`);
+    fetchMembers();
+  };
+
+  const getStatistics = () => {
+  return {
+    totalBooks: books.length,
+    totalMembers: members.length,
+    totalTransactions: transactions.length,
+    borrowedBooks: transactions.filter(t => !t.return_date).length,
+  };
+};
+
 
   useEffect(() => {
     fetchBooks();
@@ -92,6 +142,9 @@ export const LibraryProvider = ({ children }) => {
         deleteBook,
         borrowBook,
         returnBook,
+        getStatistics,
+        fetchMembers,
+        deleteMemberById
       }}
     >
       {children}

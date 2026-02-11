@@ -9,6 +9,8 @@ const RecentTransactions = () => {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 
+    console.log("Recent Transactions:", recentTransactions);
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -25,10 +27,10 @@ const RecentTransactions = () => {
           {recentTransactions.map((transaction) => (
             <tr key={transaction.id} className="hover:bg-gray-50">
               <td className="px-4 py-4">
-                <div className="font-medium text-gray-900">{transaction.bookTitle}</div>
+                <div className="font-medium text-gray-900">{transaction.book_title}</div>
               </td>
               <td className="px-4 py-4">
-                <div className="text-sm text-gray-600">{transaction.memberName}</div>
+                <div className="text-sm text-gray-600">{transaction.member_name}</div>
               </td>
               <td className="px-4 py-4">
                 <div className="flex items-center">
@@ -49,7 +51,7 @@ const RecentTransactions = () => {
               <td className="px-4 py-4">
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="mr-2" size={14} />
-                  {transaction.date}
+                  {transaction.return_date ? new Date(transaction.return_date).toLocaleDateString() : new Date(transaction.borrow_date).toLocaleDateString()}
                 </div>
               </td>
               <td className="px-4 py-4">

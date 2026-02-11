@@ -20,11 +20,11 @@ const AdminLogin = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const result = login(email, password);
+      const result =  await login(email, password);
 
-      console.log('Result' , result)
-      if (result.success) {
-        navigate('/admin/');
+
+      if (result.user && result.user.role === 'admin') {
+        navigate('/admin');
       } else {
         setError('Invalid credentials');
       }

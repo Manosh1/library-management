@@ -14,11 +14,12 @@ import {
 import MemberModal from '../components/MemberModal';
 
 const Members = () => {
-  const { members, deleteMember } = useLibrary();
+const { members,  deleteMemberById,fetchMembers } = useLibrary();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null);
+const [showModal, setShowModal] = useState(false);
+const [selectedUser, setSelectedUser] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
 
   // Filter members
@@ -32,23 +33,23 @@ const Members = () => {
 
     return matchesSearch && matchesStatus;
   });
+const handleEdit = (user) => {
+  setSelectedUser(user);
+  setShowModal(true);
+};
 
-  const handleEdit = (member) => {
-    setSelectedMember(member);
-    setShowModal(true);
-  };
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this member?")) return;
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this member?')) {
-      deleteMember(id);
-    }
-  };
+  try {
+    await deleteMemberById(id);
+  } catch (err) {
+    console.log("Delete Error", err);
+  }
+};
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedMember(null);
-  };
 
+  
   const statusColors = {
     active: 'bg-green-100 text-green-800',
     inactive: 'bg-gray-100 text-gray-800',
@@ -63,7 +64,11 @@ const Members = () => {
           <p className="text-gray-600">Manage library members and their accounts</p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+onClick={() => {
+  setSelectedUser(null);
+  setShowModal(true);
+}}
+
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus size={20} className="mr-2" />
@@ -188,7 +193,8 @@ const Members = () => {
 
                 <div className="flex justify-end space-x-2">
                   <button
-                    onClick={() => handleEdit(member)}
+onClick={() => handleEdit(member)}
+
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="Edit"
                   >
@@ -298,11 +304,17 @@ const Members = () => {
 
       {/* Modal */}
       {showModal && (
-        <MemberModal
-          member={selectedMember}
-          onClose={handleCloseModal}
-        />
-      )}
+  <MemberModal
+    user={selectedUser}
+    onClose={() => {
+      setShowModal(false);
+      setSelectedUser(null);
+    }}
+    refresh={fetchMembers}
+  />
+)}
+
+
     </div>
   );
 };

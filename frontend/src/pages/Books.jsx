@@ -60,6 +60,7 @@ const Books = () => {
     damaged: 'bg-gray-100 text-gray-800'
   };
 
+  console.log("Books Page Rendered", { books, filteredBooks });
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -191,7 +192,7 @@ const Books = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Available</p>
-                    <p className="font-medium">{book.availableCopies}/{book.copies}</p>
+                    <p className="font-medium">{book.available_copies}/{book.total_copies}</p>
                   </div>
                 </div>
 
@@ -258,8 +259,9 @@ const Books = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm">
-                        <span className="font-medium">{book.availableCopies}</span>
-                        <span className="text-gray-500">/{book.copies}</span>
+                        <span className="font-medium">{book.available_copies
+}</span>
+                        <span className="text-gray-500">/{book.total_copies}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
